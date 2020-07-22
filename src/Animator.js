@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { 
+import {
   PanResponder,
   Animated,
   Dimensions,
@@ -12,7 +12,7 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 export default class Animator extends Component{
   constructor(props){
     super(props);
-    
+
     this.position = new Animated.ValueXY(this.props.currentPosition);
 
     this._panResponder = PanResponder.create({
@@ -24,7 +24,7 @@ export default class Animator extends Component{
 
   render() {
     return (
-      <Animated.View 
+      <Animated.View
         style={[
           {...this.position.getLayout(), left: 0},
           StyleSheet.flatten([
@@ -42,9 +42,9 @@ export default class Animator extends Component{
 
   _handlePanResponderMove = (e, gesture) => {
     if (this._swipeInBounds(gesture)) {
-      this.position.setValue({ y: this.props.currentPosition.y + gesture.dy });
+      this.position.setValue({ y: this.props.currentPosition.y + gesture.dy, x: this.props.currentPosition.x });
     } else {
-      this.position.setValue({ y: this.props.upPosition.y - this._calculateEase(gesture) });
+      this.position.setValue({ y: this.props.upPosition.y - this._calculateEase(gesture), x: this.props.currentPosition.x });
     }
   }
 
@@ -69,16 +69,18 @@ export default class Animator extends Component{
 
   _transitionTo(position, callback) {
     Animated.spring(this.position, {
-      toValue: position
+      toValue: position,
+      useNativeDriver: false
     }).start(() => this.props.onExpanded());
-    
+
     this.props.setCurrentPosition(position);
     callback();
   }
 
   _resetPosition() {
     Animated.spring(this.position, {
-      toValue: this.props.currentPosition
+      toValue: this.props.currentPosition,
+      useNativeDriver: false
     }).start();
   }
 }
@@ -104,3 +106,4 @@ const styles = {
     }
   },
 }
+
